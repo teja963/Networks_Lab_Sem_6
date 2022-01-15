@@ -1,0 +1,6 @@
+Server:		ns2.google.com.
+Address:	216.239.34.10#53
+
+Name:	google.com
+Address: 2404:6800:4007:821::200e
+

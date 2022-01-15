@@ -1,0 +1,73 @@
+nitc.ac.in-ns
+Server:		ebox.nitc.ac.in.
+Address:	14.139.185.118#53
+
+nitc.ac.in	nameserver = nitc.ac.in.
+
+
+--------------------------
+google.com-a
+Server:		ns1.google.com.
+Address:	216.239.32.10#53
+
+Name:	google.com
+Address: 172.217.26.174
+
+
+--------------------------
+nitc.ac.in-a
+Server:		ebox.nitc.ac.in.
+Address:	14.139.185.118#53
+
+Name:	nitc.ac.in
+Address: 192.168.254.11
+
+
+--------------------------
+react.org-ns
+Server:		ns.trilogic.nl.
+Address:	82.161.159.20#53
+
+react.org	nameserver = ns.TriLogic.nl.
+react.org	nameserver = ns2.TriLogic.nl.
+
+
+--------------------------
+react.org-a
+Server:		ns2.trilogic.nl.
+Address:	95.97.158.108#53
+
+Name:	react.org
+Address: 151.101.130.159
+
+
+--------------------------
+youtube.com-a
+Server:		ns3.google.com.
+Address:	216.239.36.10#53
+
+Name:	youtube.com
+Address: 142.250.71.46
+
+
+--------------------------
+google.com-ns
+Server:		ns4.google.com.
+Address:	216.239.38.10#53
+
+google.com	nameserver = ns1.google.com.
+google.com	nameserver = ns4.google.com.
+google.com	nameserver = ns2.google.com.
+google.com	nameserver = ns3.google.com.
+
+
+--------------------------
+google.com-aaaa
+Server:		ns2.google.com.
+Address:	216.239.34.10#53
+
+Name:	google.com
+Address: 2404:6800:4007:821::200e
+
+
+--------------------------
