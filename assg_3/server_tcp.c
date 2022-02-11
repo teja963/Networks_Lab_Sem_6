@@ -58,7 +58,7 @@ int main(){
 	  }
 	  
 	  /* After connection established we need to listen */
-	  listen(server_sock, 5);        
+	  listen(server_sock, 100);        
 	  printf("Listening...........\n");     
 	  addr_size = sizeof(client_addr);                                                                               
 	  client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);   //This function syntax is imp                           
@@ -123,7 +123,7 @@ int main(){
 			       	send(client_sock, bf1, strlen(bf1), 0);
 			    } 
 		    }
-		    else if(strcmp(bf1, "Inventory") == 0){
+		    else if(strcmp(bf1, "SendInventory") == 0){
 		    		send(client_sock, "5", 2, 0);
 		    		
 		    		bzero(bf2, 1024);
@@ -143,7 +143,7 @@ int main(){
 			    			send(client_sock, bf1, strlen(bf1), 0);
 			    			printf(" . . .");
 			    		}
-			    		printf("\nSent Information Successfully to Client!!\n");
+			    		printf("\nSent Information Successfully to Client!!\n\n");
 			    	}	
 		    }
 		                                                                   

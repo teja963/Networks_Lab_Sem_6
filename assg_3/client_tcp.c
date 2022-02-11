@@ -5,7 +5,6 @@
 #include <sys/socket.h> 
 #include <unistd.h>
 #include <arpa/inet.h>
-#define MAX_SIZE 1024
 int main(){
 	  char* ip_addr = "127.0.0.1";
 	  int port = 5000;
@@ -13,7 +12,7 @@ int main(){
 	  struct sockaddr_in addr;
 	  socklen_t  addr_size;
 	  int n;
-	  char bf1[MAX_SIZE], bf2[MAX_SIZE];
+	  char bf1[1024], bf2[1024];
 	  /*   socket connection protocol(domain, type, protocol)   */
 	  sock = socket(AF_INET, SOCK_STREAM, 0);
 	  if(sock < 0)
@@ -75,9 +74,9 @@ int main(){
 		  else if(num == 2)
 		  {		
 		  	  bzero(bf1, 1024);
-		  	  strcpy(bf1, "Inventory");
+		  	  strcpy(bf1, "SendInventory");
 		  	  send(sock, bf1, strlen(bf1), 0);
-		  	  printf("Asked Details to Server\n");
+		  	  //printf("Asked Details to Server\n");
 		  	  
 		  	  bzero(bf2, 1024);
 		  	  recv(sock, bf2, sizeof(bf2), 0);
