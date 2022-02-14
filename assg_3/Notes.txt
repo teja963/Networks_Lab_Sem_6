@@ -1,4 +1,0 @@
-# ASSG 3
-server:
-1. socket + ip of both
-2. buffer

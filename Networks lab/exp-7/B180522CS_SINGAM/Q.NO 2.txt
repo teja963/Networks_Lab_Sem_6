@@ -1,0 +1,11 @@
+2 
+
+a) 
+Source IP address: 192.168.43.211
+Destination IP address: 14.139.185.123
+
+b) HTTP protocol (method POST)
+
+c) "user" = "admin"
+   "passwd" = "administr@tor"
+   "utype" = "Student"

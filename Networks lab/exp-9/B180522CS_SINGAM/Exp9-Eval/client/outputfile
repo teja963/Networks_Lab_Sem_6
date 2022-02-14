@@ -1,0 +1,8 @@
+Server:		127.0.0.1
+Address:	127.0.0.1#1234
+
+Non-authoritative answer:
+nitc.ac.in	nameserver = ebox.nitc.ac.in.
+
+Authoritative answers can be found from:
+

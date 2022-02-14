@@ -1,0 +1,9 @@
+First download tcp_VSWS_eval.c file compiler it using gcc compiler and execute with ./a.out command
+
+Now, goto web broswer and enter localhost:8080 to see Welcome to CSE dept text
+
+Enter localhost:8080/mypage.html to see text Welcome to networks lab, this is evaluation question
+
+Enter localhost:8080/(any other page name) This wil show file not found error
+
+Screenshots are attached

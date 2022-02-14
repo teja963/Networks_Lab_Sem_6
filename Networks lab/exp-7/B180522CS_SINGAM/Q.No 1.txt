@@ -1,0 +1,3 @@
+It takes 5 seconds between GET request and response for browsing nitc.ac.in (screenshot attached and capture file)
+
+Minerva.com uses https protocol we cannot see GET and OK responses

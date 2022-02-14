@@ -1,0 +1,14 @@
+Server:		ns2.registry.in.
+Address:	37.209.194.12#53
+
+Non-authoritative answer:
+*** Can't find nitc.ac.in: No answer
+
+Authoritative answers can be found from:
+nitc.ac.in	nameserver = ebox.nitc.ac.in.
+nitc.ac.in	nameserver = cncdns.nitc.ac.in.
+nitc.ac.in	nameserver = dns.nitc.ac.in.
+cncdns.nitc.ac.in	internet address = 14.139.185.116
+ebox.nitc.ac.in	internet address = 14.139.185.118
+dns.nitc.ac.in	internet address = 14.139.185.117
+

@@ -1,0 +1,10 @@
+Server:		ns3.registry.in.
+Address:	37.209.196.12#53
+
+ac.in	nameserver = ns2.registry.in.
+ac.in	nameserver = ns3.registry.in.
+ac.in	nameserver = ns6.registry.in.
+ac.in	nameserver = ns5.registry.in.
+ac.in	nameserver = ns1.registry.in.
+ac.in	nameserver = ns4.registry.in.
+

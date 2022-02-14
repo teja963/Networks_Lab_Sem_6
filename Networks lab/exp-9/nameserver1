@@ -1,0 +1,26 @@
+Server:		m.root-servers.net.
+Address:	202.12.27.33#53
+
+Non-authoritative answer:
+*** Can't find in: No answer
+
+Authoritative answers can be found from:
+in	nameserver = ns3.registry.in.
+in	nameserver = ns2.registry.in.
+in	nameserver = ns6.registry.in.
+in	nameserver = ns4.registry.in.
+in	nameserver = ns1.registry.in.
+in	nameserver = ns5.registry.in.
+ns1.registry.in	internet address = 37.209.192.12
+ns2.registry.in	internet address = 37.209.194.12
+ns3.registry.in	internet address = 37.209.196.12
+ns4.registry.in	internet address = 37.209.198.12
+ns5.registry.in	internet address = 156.154.100.20
+ns6.registry.in	internet address = 156.154.101.20
+ns1.registry.in	has AAAA address 2001:dcd:1::12
+ns2.registry.in	has AAAA address 2001:dcd:2::12
+ns3.registry.in	has AAAA address 2001:dcd:3::12
+ns4.registry.in	has AAAA address 2001:dcd:4::12
+ns5.registry.in	has AAAA address 2001:502:2eda::20
+ns6.registry.in	has AAAA address 2001:502:ad09::20
+
