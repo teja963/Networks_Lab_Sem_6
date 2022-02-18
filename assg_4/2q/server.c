@@ -6,8 +6,8 @@
 #include<sys/types.h>
 #include<netinet/in.h>
 #include<arpa/inet.h>
-char ans[1024];
-void eval(char *tmp2){
+
+void eval(char *tmp2, char *ans){
 	long long int val = -1, index1 = 0, index2 = 0, i = 0;
 	char num1[1024], num2[1024], symbol = '!';
 	while(i < strlen(tmp2)){
@@ -74,13 +74,16 @@ int main(){
 	while(1){
 		addr_size = sizeof(client_addr);
 		client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);
+		if(client_sock < 0){	//This condition avoids infinite loop iteration after disconnecting
+			exit(1);
+		}
 		printf("[+]Client Connected!!\n");
 	
 		if((childpid = fork()) == 0){
 			close(server_sock);
 			
 			while(1){
-				char tmp1[1024], tmp2[1024];
+				char tmp1[1024], tmp2[1024], ans[1024];
 				bzero(bf, 1024);
 				recv(client_sock, bf, sizeof(bf), 0);
 				
@@ -88,15 +91,15 @@ int main(){
 				printf("Connected with %s\n\n[%s]: ", tmp1, tmp1);
 				sscanf(bf, "%*s %s", tmp2);
 				printf("%s\n", tmp2);
-				if(strcmp(tmp2, "Exit\n") == 0){
+		
+				if(strcmp(tmp2, "Exit") == 0){
 					printf("[-]Disconnected from %s\n", tmp1);
 					break;
 				}
-				
-				eval(tmp2);
+				bzero(ans, 1024);
+				eval(tmp2, ans);
 				send(client_sock, ans, strlen(ans), 0);
-				printf("[Server]: %s\n", ans);
-				bzero(ans, 1024);	
+				printf("[Server]: %s\n", ans);	
 			}	
 		}
 	}
