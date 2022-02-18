@@ -43,6 +43,7 @@ int main(){
 	struct sockaddr_in server_addr, client_addr;
 	socklen_t addr_size;
 	char bf[1024];
+	pid_t childpid;         //Multiple clients handiling technique
 	server_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if(server_sock < 0){
 		perror("[-]Socket Connection is not established\n");
@@ -69,24 +70,35 @@ int main(){
 	listen(server_sock, 5);
 	printf("[+]Listening.........\n");
 	
-	addr_size = sizeof(client_addr);
-	client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);
-	printf("[+]Client Connected!!\n");
 	
 	while(1){
-		char tmp1[1024], tmp2[1024];
-		bzero(bf, 1024);
-		recv(client_sock, bf, sizeof(bf), 0);
-		
-		sscanf(bf, "%s %*s", tmp1);
-		printf("Connected with %s\n\n[%s]: ", tmp1, tmp1);
-		sscanf(bf, "%*s %s", tmp2);
-		printf("%s\n", tmp2);
-		
-		eval(tmp2);
-		send(client_sock, ans, strlen(ans), 0);
-		printf("[Server]: %s", ans);
-		printf("\n");
+		addr_size = sizeof(client_addr);
+		client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);
+		printf("[+]Client Connected!!\n");
+	
+		if((childpid = fork()) == 0){
+			close(server_sock);
+			
+			while(1){
+				char tmp1[1024], tmp2[1024];
+				bzero(bf, 1024);
+				recv(client_sock, bf, sizeof(bf), 0);
+				
+				sscanf(bf, "%s %*s", tmp1);
+				printf("Connected with %s\n\n[%s]: ", tmp1, tmp1);
+				sscanf(bf, "%*s %s", tmp2);
+				printf("%s\n", tmp2);
+				if(strcmp(tmp2, "Exit\n") == 0){
+					printf("[-]Disconnected from %s\n", tmp1);
+					break;
+				}
+				
+				eval(tmp2);
+				send(client_sock, ans, strlen(ans), 0);
+				printf("[Server]: %s\n", ans);
+				bzero(ans, 1024);	
+			}	
+		}
 	}
 	close(client_sock);
 	printf("Client left the chat and you ended the call!!\n");

@@ -40,6 +40,7 @@ int main(){
 		strcat(bf1, bf2);
 		send(sock, bf1, strlen(bf1), 0);
 		
+		if(strcmp(bf2, "Exit\n") == 0)break;
 		printf("[Server]: ");
 		bzero(bf1, 1024);
 		recv(sock, bf1, sizeof(bf1), 0);
@@ -47,7 +48,7 @@ int main(){
 		
 	}
 	close(sock);
-	printf("You Disconnected the call!!!\n");
+	printf("[-]You Disconnected the call!!!\n");
 	
 	return 0;
 	}
