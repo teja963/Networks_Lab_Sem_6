@@ -93,7 +93,7 @@ int main(){
 				printf("%s\n", tmp2);
 		
 				if(strcmp(tmp2, "Exit") == 0){
-					printf("[-]Disconnected from %s\n", tmp1);
+					printf("[-]%s Disconnected!!!\n", tmp1);
 					break;
 				}
 				bzero(ans, 1024);
