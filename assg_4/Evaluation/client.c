@@ -85,7 +85,7 @@ int main(int argc, char **argv){
 	char psd[100];
 	printf("Enter the Password\n");
 	fgets(psd, 100, stdin);
-	if(strcmp(psd,"12345\n") != 0){
+	if(strcmp(psd,"234513\n") != 0){
 		printf("You Enter Incorrect Password\n");
 	}
 	else{

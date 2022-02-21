@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <signal.h>
 
-#define MAX_CLIENTS 100
+#define MAX_CLIENTS 2
 #define BUFFER_SZ 2048
 
 static _Atomic unsigned int cli_count = 0;
