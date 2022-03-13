@@ -90,11 +90,24 @@ int main(){
 		  			bzero(bf1, 1024);
 		  			recv(sock, bf1, sizeof(bf1), 0); //getting username from server
 		  			printf("Welcome <%s>!!!!\n", bf1);
+		  			
+		  			/*Client is requesting to show list of files in the server*/
+		  			bzero(bf1, 1024);
+		  			fgets(bf1, 1024, stdin);
+		  			send(sock, bf1, strlen(bf1), 0);
+		  			
+		  			bzero(bf1, 1024);
+		  			recv(sock, bf1, sizeof(bf1), 0);
+		  			printf("%s", bf1);
+		  			
 		  		}
 		  		else{
 		  			printf("Please Enter Password Correctly!!!\n");
 		  			goto password_taking;	
 	  		}		
+	  	}
+	  	else if(strcmp(bf1, "Already Login") == 0){
+	  		printf("You Already Logined!!\n");
 	  	}
 	  	else{
 	  		printf("Please Enter username correctly!!\n");

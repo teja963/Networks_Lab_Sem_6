@@ -6,8 +6,25 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <stdbool.h>
+#include <dirent.h>
 char cmd[1024], search[1024], http_status_300[1024] = "Correct Username; Need password", http_status_301[1024] = "Incorrect Username", http_status_305[1024] = "User Authenticated with password", http_status_310[1024] = "Incorrect password", http_status_505[1024] = "Command not supported";
 static char user_name[1024], password[1024];
+static int login = 0;
+void fun_List(){
+	DIR* dir = opendir(".");  //pointing to current directory
+	if(dir == NULL){
+		strcpy(search, "NO FILES FOUND!!");
+	}
+	
+	struct dirent* entity = readdir(dir);  //reading from that directory
+	while(entity != NULL){
+		strcat(search, entity->d_name);
+		strcat(search, "\n");
+		entity = readdir(dir);
+	}
+	
+	closedir(dir);
+}
 int main(){
 	  char* ip_addr = "127.0.0.1";
 	  int port = 5001;
@@ -72,29 +89,37 @@ int main(){
 	  	
 	  	/*USERN function*/
 	  	if(strcmp(cmd, "USERN") == 0){
-	  		bool user_found = 0;
-	  		printf("Searching for username %s %ld\n\n", search, strlen(search));
-	  		char uname[1024], upass[1024];
-	  		 /*File Operations*/
-	  		FILE* fp = fopen("logincred.txt", "r");
-	  		
-	  		while(fscanf(fp, "%s %s", uname, upass) != EOF){
-	  			printf("%s %ld\n", uname, strlen(uname));
-	  			if(strcmp(uname, search) == 0){
-	  				printf("Username found!!\n");
-	  				strcpy(user_name, uname);
-	  				strcpy(password, upass);
-	  				send(client_sock, http_status_300, strlen(http_status_300), 0);
-	  				user_found = 1;
-	  				break;
-	  			}
+	  		if(login == 0){
+	  			bool user_found = 0;
+		  		printf("Searching for username %s\n\n", search);
+		  		char uname[1024], upass[1024];
+		  		 /*File Operations*/
+		  		FILE* fp = fopen("/home/user/Documents/Sem 6/NETWORKS-LAB/assg_6/logincred.txt", "r");
+		  		
+		  		while(fscanf(fp, "%s %s", uname, upass) != EOF){
+		  			if(strcmp(uname, search) == 0){
+		  				printf("Username found!!\n");
+		  				strcpy(user_name, uname);
+		  				strcpy(password, upass);
+		  				send(client_sock, http_status_300, strlen(http_status_300), 0);
+		  				user_found = 1;
+		  				login = 1;
+		  				break;
+		  			}
+		  		}
+		  		
+		  		/*After getting username and password from server*/
+		  		if(user_found == 0){
+		  			printf("User %s not found!!\n", search);
+		  			send(client_sock, http_status_301, strlen(http_status_301), 0);
+		  		}
+	  		}
+	  		else{
+	  			bzero(bf1, 1024);
+	  			strcpy(bf1, "Already Login");
+	  			send(client_sock, bf1, strlen(bf1), 0);
 	  		}
 	  		
-	  		/*After getting username and password from server*/
-	  		if(user_found == 0){
-	  			printf("User %s not found!!\n", search);
-	  			send(client_sock, http_status_301, strlen(http_status_301), 0);
-	  		}
 	  	}
 	  	else if(strcmp(cmd, "PASSWD") == 0){ /*Taking password and Checking password*/
 	  				if(strcmp(search, password) == 0){
@@ -102,8 +127,17 @@ int main(){
 	  					
 	  					bzero(cmd, 1024);
 	  					recv(client_sock, cmd, sizeof(cmd), 0);
+
+	  					send(client_sock, user_name, strlen(user_name), 0);     /*Sending user name*/
 	  					
-	  					send(client_sock, user_name, strlen(user_name), 0);
+	  					bzero(cmd, 1024);
+	  					recv(client_sock, cmd, sizeof(cmd), 0);
+	  					
+	  					if(strcmp(cmd, "ListDir\n") == 0){
+	  						printf("Client Asking Files List!!!!\n");
+	  						fun_List();
+	  						send(client_sock, search, strlen(search), 0);
+	  					}
 	  				}
 	  				else{
 	  					printf("Incorrect Password!!\n");
