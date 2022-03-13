@@ -70,6 +70,41 @@ void fun_Get_File(){
 	send(client_sock, search, strlen(search), 0);
 }
 
+void fun_Store_File(){
+	char msg[500];
+	bzero(msg, 500);
+	if(recv(client_sock, msg, sizeof(msg), 0) > 0){
+		if(strcmp(msg, "Sending video") == 0){
+			FILE * fp;
+			fp = fopen("p1.php", "w");
+			int bytes;
+			int i = 0;
+			
+			bzero(msg, 500);
+			while(recv(client_sock, msg, sizeof(msg), 0) >= 1){
+				
+				if(strcmp(msg, "Finished") == 0)break;
+				
+				//acknowledgement
+				char bf[500];
+				sprintf(bf,"Received");
+				
+				send(client_sock, bf, strlen(bf), 0);
+				
+				fprintf(fp, "%s", msg);
+				i += 500;
+				if(i % 5000000 == 0)printf("%d mb received\n", i / 1000000);
+				bzero(msg, 500);	
+			}
+			sprintf(search, "[+]Received Completely!!!");
+		}
+		else{
+		printf("%s", msg);
+		fflush(stdout);
+		}
+	}
+}
+
 int main(){
 	  char* ip_addr = "127.0.0.1";
 	  int port = 5000;
@@ -187,6 +222,11 @@ int main(){
 		  					else if(strcmp(cmd, "CreateFile\n") == 0){
 		  						printf("Client requested to create file!!!!\n");
 		  						fun_Create();
+		  						send(client_sock, search, strlen(search), 0);
+		  					}
+		  					else if(strcmp(cmd, "StoreFile\n") == 0){
+		  						printf("Receving file from client!!!!\n");
+		  						fun_Store_File();
 		  						send(client_sock, search, strlen(search), 0);
 		  					}
 		  					else if(strcmp(cmd, "GetFile\n") == 0){

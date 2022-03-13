@@ -7,7 +7,8 @@
 #include <arpa/inet.h>
 char http_status_300[1024] = "Correct Username; Need password", http_status_301[1024] = "Incorrect Username", http_status_305[1024] = "User Authenticated with password", http_status_310[1024] = "Incorrect password", http_status_505[1024] = "Command not supported", http_ok[10] = "Send";
 int sock;
-void fun_Recv_File(){
+
+void fun_Get_File(){
 	char msg[500];
 	bzero(msg, 500);
 	if(recv(sock, msg, sizeof(msg), 0) > 0){
@@ -40,6 +41,29 @@ void fun_Recv_File(){
 		fflush(stdout);
 		}
 	}
+}
+
+void fun_Store_File(){
+	char search[500],bf[500];
+	sprintf(search, "Sending video");
+	send(sock, search, strlen(search), 0);
+	
+	FILE *fp = fopen("py.php", "r");
+	
+	int bytes, i = 0;
+	printf("File Transfer starting\n");
+	while( (bytes = fread(search, 1, 500, fp)) >= 1){
+		send(sock, search, strlen(search), 0);
+		
+		//Conformation
+		bzero(bf, 500);
+		recv(sock, bf, sizeof(bf), 0);
+		i += 500;
+		if(i % 5000000 == 0)
+			printf("%d mb sent\n", i/1000000);
+	}
+	sprintf(search, "Finished");
+	send(sock, search, strlen(search), 0);
 }
 int main(){
 	  char* ip_addr = "127.0.0.1";
@@ -131,8 +155,11 @@ int main(){
 			  			fgets(bf1, 1024, stdin);
 			  			send(sock, bf1, strlen(bf1), 0);
 			  			
+			  			if(strcmp(bf1, "StoreFile\n") == 0){
+			  				fun_Store_File();
+			  			}
 			  			if(strcmp(bf1, "GetFile\n") == 0){
-							fun_Recv_File();
+							fun_Get_File();
 		   				}	
 			  			else if(strcmp(bf1, "QUIT\n") == 0){
 			  				break;
