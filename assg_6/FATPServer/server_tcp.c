@@ -10,7 +10,9 @@
 char cmd[1024], search[1024], http_status_300[1024] = "Correct Username; Need password", http_status_301[1024] = "Incorrect Username", http_status_305[1024] = "User Authenticated with password", http_status_310[1024] = "Incorrect password", http_status_505[1024] = "Command not supported";
 static char user_name[1024], password[1024];
 static int login = 0;
+
 void fun_List(){
+	bzero(search, 1024);
 	DIR* dir = opendir(".");  //pointing to current directory
 	if(dir == NULL){
 		strcpy(search, "NO FILES FOUND!!");
@@ -25,9 +27,24 @@ void fun_List(){
 	
 	closedir(dir);
 }
+
+void fun_Create(){
+	bzero(search, 1024);
+	FILE* fp;
+	static const char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	char name[9];
+	for(int i = 0; i < 5; i++){
+		name[i] = str[rand() % (strlen(str) - 1)];
+	}
+	strcat(name, ".txt"); //adding extensions
+	fp = fopen(name, "w");
+	strcpy(search, "File Created Successfully!!");
+	fclose(fp);
+	
+}
 int main(){
 	  char* ip_addr = "127.0.0.1";
-	  int port = 5001;
+	  int port = 5000;
 	  int server_sock, client_sock;
 	  struct sockaddr_in server_addr, client_addr;
 	  socklen_t  addr_size;
@@ -98,7 +115,7 @@ int main(){
 		  		
 		  		while(fscanf(fp, "%s %s", uname, upass) != EOF){
 		  			if(strcmp(uname, search) == 0){
-		  				printf("Username found!!\n");
+		  				printf("Username %s found!!\n", uname);
 		  				strcpy(user_name, uname);
 		  				strcpy(password, upass);
 		  				send(client_sock, http_status_300, strlen(http_status_300), 0);
@@ -130,14 +147,26 @@ int main(){
 
 	  					send(client_sock, user_name, strlen(user_name), 0);     /*Sending user name*/
 	  					
-	  					bzero(cmd, 1024);
-	  					recv(client_sock, cmd, sizeof(cmd), 0);
+	  					client_logined:  /*Client Logined Activity Process*/
 	  					
-	  					if(strcmp(cmd, "ListDir\n") == 0){
-	  						printf("Client Asking Files List!!!!\n");
-	  						fun_List();
-	  						send(client_sock, search, strlen(search), 0);
-	  					}
+		  					bzero(cmd, 1024);
+		  					recv(client_sock, cmd, sizeof(cmd), 0);
+		  					
+		  					if(strcmp(cmd, "ListDir\n") == 0){
+		  						printf("Client Asking Files List!!!!\n");
+		  						fun_List();
+		  						send(client_sock, search, strlen(search), 0);
+		  					}
+		  					else if(strcmp(cmd, "CreateFile\n") == 0){
+		  						printf("Client requested to create file!!!!\n");
+		  						fun_Create();
+		  						send(client_sock, search, strlen(search), 0);
+		  					}
+		  					else if(strcmp(cmd, "QUIT\n") == 0){
+		  						printf("[-]Client Disconnected!!\n");
+		  						break;
+		  					}
+		  					goto client_logined;
 	  				}
 	  				else{
 	  					printf("Incorrect Password!!\n");

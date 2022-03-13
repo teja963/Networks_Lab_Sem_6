@@ -8,7 +8,7 @@
 char http_status_300[1024] = "Correct Username; Need password", http_status_301[1024] = "Incorrect Username", http_status_305[1024] = "User Authenticated with password", http_status_310[1024] = "Incorrect password", http_status_505[1024] = "Command not supported", http_ok[10] = "Send";
 int main(){
 	  char* ip_addr = "127.0.0.1";
-	  int port = 5001;
+	  int port = 5000;
 	  int sock;
 	  struct sockaddr_in addr;
 	  socklen_t  addr_size;
@@ -91,14 +91,22 @@ int main(){
 		  			recv(sock, bf1, sizeof(bf1), 0); //getting username from server
 		  			printf("Welcome <%s>!!!!\n", bf1);
 		  			
-		  			/*Client is requesting to show list of files in the server*/
-		  			bzero(bf1, 1024);
-		  			fgets(bf1, 1024, stdin);
-		  			send(sock, bf1, strlen(bf1), 0);
-		  			
-		  			bzero(bf1, 1024);
-		  			recv(sock, bf1, sizeof(bf1), 0);
-		  			printf("%s", bf1);
+		  			client_logined:   /*After logined activity*/
+			  			
+			  			bzero(bf1, 1024);
+			  			fgets(bf1, 1024, stdin);
+			  			send(sock, bf1, strlen(bf1), 0);
+			  			
+			  			if(strcmp(bf1, "QUIT\n") == 0){
+			  				break;
+			  				close(sock);
+			  			}
+			  			
+			  			bzero(bf1, 1024);
+			  			recv(sock, bf1, sizeof(bf1), 0);
+			  			printf("%s\n", bf1);
+			  			
+			  			goto client_logined;
 		  			
 		  		}
 		  		else{
