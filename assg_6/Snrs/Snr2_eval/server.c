@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include<arpa/inet.h>
@@ -55,7 +54,7 @@ int main() {
 	printf("CONNECTED TO CLIENT.................\n");
 
 	int temp;
-	char buffer[501], buffer_1[1024];
+	char buffer[501], buffer_1[1034];
 	char username[1024];
 	int state = 0;
 
@@ -140,7 +139,7 @@ int main() {
 
 		else if(strncmp("CreateFile", buffer, 10) == 0 && state == 2) {
 			char *str = buffer + 11;
-			printf("%s %d\n", str, strlen(str));
+			printf("%s %ld\n", str, strlen(str));
 			FILE *fp = fopen(str, "r");
 
 			if(fp == NULL)
