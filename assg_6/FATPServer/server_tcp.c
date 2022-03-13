@@ -13,93 +13,86 @@ static char user_name[1024], password[1024];
 static int login = 0;
 int server_sock, client_sock;
 
-void fun_List(){
-	bzero(search, 1024);
+void fun_List(char* bf2){
+	bzero(bf2, 1024);
 	DIR* dir = opendir(".");  //pointing to current directory
-	if(dir == NULL){
-		strcpy(search, "NO FILES FOUND!!");
-	}
-	
-	strcat(search, "<!--------------");
-	struct dirent* entity = readdir(dir);  //reading from that directory
-	while(entity != NULL){
-		strcat(search, entity->d_name);
-		strcat(search, "\n");
-		entity = readdir(dir);
-	}
-	strcat(search, "----------------!>");
-	
-	closedir(dir);
+	if(dir){
+		struct dirent* entity;  //reading from that directory
+		while((entity = readdir(dir)) != NULL){
+			strcat(bf2, "\n");
+			strcat(bf2, entity->d_name);
+			
+		}
+		closedir(dir);	
+	}	
 }
 
-static void fun_Create(){
-	bzero(search, 1024);
-	FILE* fp;
-	static const char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	char name[9];
-	for(int i = 0; i < 5; i++){
-		name[i] = str[rand() % (strlen(str) - 1)];
-	}
-	strcat(name, ".txt"); //adding extensions
-	fp = fopen(name, "w");
-	strcpy(search, "File Created Successfully!!");
+void fun_Create(char* name, char* bf2){
+	bzero(bf2, 1024);
+	
+	FILE* fp = fopen(name, "w+");
+	
+	sprintf(bf2, "File created successfully!!!!\n");
 	fclose(fp);
 	
 }
 
-void fun_Get_File(){
+void fun_Get_File(char* name, char* bf2){
 	char bf[500];
-	sprintf(search, "Sending video");
-	send(client_sock, search, strlen(search), 0);
+	bzero(bf2, 1024);
+	sprintf(bf2, "Sending video");
+	send(client_sock, bf2, strlen(bf2), 0);
 	
-	FILE *fp = fopen("send", "r");
+	FILE *fp = fopen(name, "r");
 	
-	int bytes, i = 0;
-	printf("File Transfer starting\n");
-	while( (bytes = fread(search, 1, 500, fp)) >= 1){
-		send(client_sock, search, strlen(search), 0);
+	printf("File Transfer starting Server!!!\n");
+	int bytes = 0;
+	while( (bytes = fread(bf2, 1, 1024, fp)) >= 1){
+		send(client_sock, bf2, strlen(bf2), 0);
 		
 		//Conformation
 		bzero(bf, 500);
 		recv(client_sock, bf, sizeof(bf), 0);
-		i += 500;
-		if(i % 5000000 == 0)
-			printf("%d mb sent\n", i/1000000);
 	}
-	sprintf(search, "Finished");
-	send(client_sock, search, strlen(search), 0);
+	fclose(fp);
+	sprintf(bf2, "Finished");
+	send(client_sock, bf2, strlen(bf2), 0);
+	sprintf(bf2, "File Received Successfully!!!!!");
 }
 
-void fun_Store_File(){
-	char msg[500];
-	bzero(msg, 500);
-	if(recv(client_sock, msg, sizeof(msg), 0) > 0){
-		if(strcmp(msg, "Sending video") == 0){
-			FILE * fp;
-			fp = fopen("p1.php", "w");
-			int bytes;
-			int i = 0;
+void fun_Store_File(char* name){
+	char bf2[1024];
+	bzero(bf2, 1024);
+	sprintf(bf2, "Dummy Flow");
+	send(client_sock, bf2, strlen(bf2), 0);
+	
+	if(recv(client_sock, bf2, sizeof(bf2), 0) > 0){
+		if(strcmp(bf2, "Sending video") == 0){
+			FILE *fp = fopen(name, "w");
 			
-			bzero(msg, 500);
-			while(recv(client_sock, msg, sizeof(msg), 0) >= 1){
+			bzero(bf2, 1024);
+			while(recv(client_sock, bf2, sizeof(bf2), 0) >= 1){
 				
-				if(strcmp(msg, "Finished") == 0)break;
+				if(strcmp(bf2, "Finished") == 0)break;
 				
 				//acknowledgement
 				char bf[500];
 				sprintf(bf,"Received");
-				
 				send(client_sock, bf, strlen(bf), 0);
 				
-				fprintf(fp, "%s", msg);
-				i += 500;
-				if(i % 5000000 == 0)printf("%d mb received\n", i / 1000000);
-				bzero(msg, 500);	
+				fprintf(fp, "%s", bf2);
+				bzero(bf2, 1024);	
 			}
-			sprintf(search, "[+]Received Completely!!!");
+			fclose(fp);
+			
+			bzero(bf2, 1024);
+			sprintf(bf2, "Successfully Sent to server!!!");
+			send(client_sock, bf2, strlen(bf2), 0);
+			printf("%s\n", bf2);
+				
 		}
 		else{
-		printf("%s", msg);
+		printf("%s", search);
 		fflush(stdout);
 		}
 	}
@@ -107,7 +100,7 @@ void fun_Store_File(){
 
 int main(){
 	  char* ip_addr = "127.0.0.1";
-	  int port = 5000;
+	  int port = 5001;
 	  struct sockaddr_in server_addr, client_addr;
 	  socklen_t  addr_size;
 	  int n;
@@ -211,30 +204,34 @@ int main(){
 	  					
 	  					client_logined:  /*Client Logined Activity Process*/
 	  					
+		  					bzero(bf1, 1024);
+		  					recv(client_sock, bf1, sizeof(bf1), 0);
 		  					bzero(cmd, 1024);
-		  					recv(client_sock, cmd, sizeof(cmd), 0);
+		  					bzero(search, 1024);
+		  					sscanf(bf1, "%s %*s", cmd);
+		  					sscanf(bf1, "%*s %s", search);
 		  					
-		  					if(strcmp(cmd, "ListDir\n") == 0){
+		  					
+		  					if(strcmp(cmd, "ListDir") == 0){
 		  						printf("Client Asking Files List!!!!\n");
-		  						fun_List();
-		  						send(client_sock, search, strlen(search), 0);
+		  						fun_List(bf2);
+		  						send(client_sock, bf2, strlen(bf2), 0);
 		  					}
-		  					else if(strcmp(cmd, "CreateFile\n") == 0){
-		  						printf("Client requested to create file!!!!\n");
-		  						fun_Create();
-		  						send(client_sock, search, strlen(search), 0);
+		  					else if(strcmp(cmd, "CreateFile") == 0){
+		  						printf("Client requested to create file!!!!\n\n");
+		  						fun_Create(search, bf2);
+		  						send(client_sock, bf2, strlen(bf2), 0);
 		  					}
-		  					else if(strcmp(cmd, "StoreFile\n") == 0){
-		  						printf("Receving file from client!!!!\n");
-		  						fun_Store_File();
-		  						send(client_sock, search, strlen(search), 0);
+		  					else if(strcmp(cmd, "StoreFile") == 0){
+		  						printf("Receving file %s from client!!!!\n\n", search);
+		  						fun_Store_File(search);
 		  					}
-		  					else if(strcmp(cmd, "GetFile\n") == 0){
-		  						printf("Cliented requested for File!!!!\n");
-		  						fun_Get_File();
-		  						send(client_sock, search, strlen(search), 0);
+		  					else if(strcmp(cmd, "GetFile") == 0){
+		  						printf("Cliented requested for File!!!!\n\n");
+		  						fun_Get_File(search, bf2);
+		  						send(client_sock, bf2, strlen(bf2), 0);
 		  					}
-		  					else if(strcmp(cmd, "QUIT\n") == 0){
+		  					else if(strcmp(cmd, "QUIT") == 0){
 		  						printf("[-]Client Disconnected!!\n");
 		  						break;
 		  					}

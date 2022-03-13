@@ -7,67 +7,65 @@
 #include <arpa/inet.h>
 char http_status_300[1024] = "Correct Username; Need password", http_status_301[1024] = "Incorrect Username", http_status_305[1024] = "User Authenticated with password", http_status_310[1024] = "Incorrect password", http_status_505[1024] = "Command not supported", http_ok[10] = "Send";
 int sock;
+char cmd[1024], search[1024];
 
-void fun_Get_File(){
-	char msg[500];
-	bzero(msg, 500);
-	if(recv(sock, msg, sizeof(msg), 0) > 0){
-		if(strcmp(msg, "Sending video") == 0){
-			FILE * fp;
-			fp = fopen("recv", "w");
-			int bytes;
-			int i = 0;
+void fun_Get_File(char* name){
+	bzero(search, 1024);
+	if(recv(sock, search, sizeof(search), 0) > 0){
+		if(strcmp(search, "Sending video") == 0){
+			FILE *fp = fopen(name, "w");
 			
-			bzero(msg, 500);
-			while(recv(sock, msg, sizeof(msg), 0) >= 1){
+			bzero(search, 1024);
+			while(recv(sock, search, sizeof(search), 0) >= 1){
 				
-				if(strcmp(msg, "Finished") == 0)break;
+				if(strcmp(search, "Finished") == 0)break;
 				
 				//acknowledgement
 				char bf[500];
 				sprintf(bf,"Received");
-				
 				send(sock, bf, strlen(bf), 0);
 				
-				fprintf(fp, "%s", msg);
-				i += 500;
-				if(i % 5000000 == 0)printf("%d mb received\n", i / 1000000);
-				bzero(msg, 500);	
+				fprintf(fp, "%s", search);
+				bzero(search, 1024);	
 			}
+			fclose(fp);
 				
 		}
 		else{
-		printf("%s", msg);
+		printf("%s", search);
 		fflush(stdout);
 		}
 	}
 }
 
-void fun_Store_File(){
-	char search[500],bf[500];
+void fun_Store_File(char* name){
+	char bf[500];
+	bzero(search, 1024);
+	recv(sock, search, sizeof(search), 0);
+	
+	bzero(search, 1024);
 	sprintf(search, "Sending video");
 	send(sock, search, strlen(search), 0);
 	
-	FILE *fp = fopen("py.php", "r");
+	FILE *fp = fopen(name, "r");
 	
-	int bytes, i = 0;
-	printf("File Transfer starting\n");
-	while( (bytes = fread(search, 1, 500, fp)) >= 1){
+	printf("File Transfer starting Client!!!\n");
+	int bytes = 0;
+	while( (bytes = fread(search, 1, 1024, fp)) >= 1){
 		send(sock, search, strlen(search), 0);
 		
 		//Conformation
 		bzero(bf, 500);
 		recv(sock, bf, sizeof(bf), 0);
-		i += 500;
-		if(i % 5000000 == 0)
-			printf("%d mb sent\n", i/1000000);
 	}
+	fclose(fp);
 	sprintf(search, "Finished");
 	send(sock, search, strlen(search), 0);
+	
 }
 int main(){
 	  char* ip_addr = "127.0.0.1";
-	  int port = 5000;
+	  int port = 5001;
 	  struct sockaddr_in addr;
 	  socklen_t  addr_size;
 	  int n;
@@ -154,21 +152,23 @@ int main(){
 			  			bzero(bf1, 1024);
 			  			fgets(bf1, 1024, stdin);
 			  			send(sock, bf1, strlen(bf1), 0);
+			  			sscanf(bf1, "%s %*s", cmd);
+			  			sscanf(bf1, "%*s %s", bf2);
 			  			
-			  			if(strcmp(bf1, "StoreFile\n") == 0){
-			  				fun_Store_File();
+			  			if(strcmp(cmd, "StoreFile") == 0){
+			  				fun_Store_File(bf2);	
 			  			}
-			  			if(strcmp(bf1, "GetFile\n") == 0){
-							fun_Get_File();
+			  			if(strcmp(cmd, "GetFile") == 0){
+							fun_Get_File(bf2);
 		   				}	
-			  			else if(strcmp(bf1, "QUIT\n") == 0){
+			  			else if(strcmp(cmd, "QUIT") == 0){
 			  				break;
 			  				close(sock);
 			  			}
 			  			
 			  			bzero(bf1, 1024);
 			  			recv(sock, bf1, sizeof(bf1), 0);
-			  			printf("%s\n", bf1);
+			  			printf("->%s\n", bf1);
 			  			
 			  			goto client_logined;
 		  			
