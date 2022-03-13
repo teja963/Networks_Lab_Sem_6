@@ -7,9 +7,11 @@
 #include <arpa/inet.h>
 #include <stdbool.h>
 #include <dirent.h>
+
 char cmd[1024], search[1024], http_status_300[1024] = "Correct Username; Need password", http_status_301[1024] = "Incorrect Username", http_status_305[1024] = "User Authenticated with password", http_status_310[1024] = "Incorrect password", http_status_505[1024] = "Command not supported";
 static char user_name[1024], password[1024];
 static int login = 0;
+int server_sock, client_sock;
 
 void fun_List(){
 	bzero(search, 1024);
@@ -18,17 +20,19 @@ void fun_List(){
 		strcpy(search, "NO FILES FOUND!!");
 	}
 	
+	strcat(search, "<!--------------");
 	struct dirent* entity = readdir(dir);  //reading from that directory
 	while(entity != NULL){
 		strcat(search, entity->d_name);
 		strcat(search, "\n");
 		entity = readdir(dir);
 	}
+	strcat(search, "----------------!>");
 	
 	closedir(dir);
 }
 
-void fun_Create(){
+static void fun_Create(){
 	bzero(search, 1024);
 	FILE* fp;
 	static const char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -42,10 +46,33 @@ void fun_Create(){
 	fclose(fp);
 	
 }
+
+void fun_Get_File(){
+	char bf[500];
+	sprintf(search, "Sending video");
+	send(client_sock, search, strlen(search), 0);
+	
+	FILE *fp = fopen("send", "r");
+	
+	int bytes, i = 0;
+	printf("File Transfer starting\n");
+	while( (bytes = fread(search, 1, 500, fp)) >= 1){
+		send(client_sock, search, strlen(search), 0);
+		
+		//Conformation
+		bzero(bf, 500);
+		recv(client_sock, bf, sizeof(bf), 0);
+		i += 500;
+		if(i % 5000000 == 0)
+			printf("%d mb sent\n", i/1000000);
+	}
+	sprintf(search, "Finished");
+	send(client_sock, search, strlen(search), 0);
+}
+
 int main(){
 	  char* ip_addr = "127.0.0.1";
 	  int port = 5000;
-	  int server_sock, client_sock;
 	  struct sockaddr_in server_addr, client_addr;
 	  socklen_t  addr_size;
 	  int n;
@@ -111,7 +138,7 @@ int main(){
 		  		printf("Searching for username %s\n\n", search);
 		  		char uname[1024], upass[1024];
 		  		 /*File Operations*/
-		  		FILE* fp = fopen("/home/user/Documents/Sem 6/NETWORKS-LAB/assg_6/logincred.txt", "r");
+		  		FILE* fp = fopen("../logincred.txt", "r");
 		  		
 		  		while(fscanf(fp, "%s %s", uname, upass) != EOF){
 		  			if(strcmp(uname, search) == 0){
@@ -160,6 +187,11 @@ int main(){
 		  					else if(strcmp(cmd, "CreateFile\n") == 0){
 		  						printf("Client requested to create file!!!!\n");
 		  						fun_Create();
+		  						send(client_sock, search, strlen(search), 0);
+		  					}
+		  					else if(strcmp(cmd, "GetFile\n") == 0){
+		  						printf("Cliented requested for File!!!!\n");
+		  						fun_Get_File();
 		  						send(client_sock, search, strlen(search), 0);
 		  					}
 		  					else if(strcmp(cmd, "QUIT\n") == 0){
