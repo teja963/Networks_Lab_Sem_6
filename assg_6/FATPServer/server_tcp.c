@@ -7,8 +7,8 @@
 #include <arpa/inet.h>
 #include <stdbool.h>
 #include <dirent.h>
-
-char cmd[1024], search[1024], http_status_300[1024] = "Correct Username; Need password", http_status_301[1024] = "Incorrect Username", http_status_305[1024] = "User Authenticated with password", http_status_310[1024] = "Incorrect password", http_status_505[1024] = "Command not supported";
+#include <time.h>
+char cmd[1024], search[1024], http_status_300[1024] = "300  Correct Username; Need password", http_status_301[1024] = "301  Incorrect Username", http_status_305[1024] = "305  User Authenticated with password", http_status_310[1024] = "310  Incorrect password", http_status_505[1024] = "505  Command not supported";
 static char user_name[1024], password[1024];
 static int login = 0;
 int server_sock, client_sock;
@@ -84,11 +84,6 @@ void fun_Store_File(char* name){
 				bzero(bf2, 1024);	
 			}
 			fclose(fp);
-			
-			bzero(bf2, 1024);
-			sprintf(bf2, "Successfully Sent to server!!!");
-			send(client_sock, bf2, strlen(bf2), 0);
-			printf("%s\n", bf2);
 				
 		}
 		else{
@@ -211,7 +206,9 @@ int main(){
 		  					sscanf(bf1, "%s %*s", cmd);
 		  					sscanf(bf1, "%*s %s", search);
 		  					
-		  					
+		  					/*Initiallizing clock*/
+		  					clock_t t;
+		  					t = clock();
 		  					if(strcmp(cmd, "ListDir") == 0){
 		  						printf("Client Asking Files List!!!!\n");
 		  						fun_List(bf2);
@@ -225,10 +222,25 @@ int main(){
 		  					else if(strcmp(cmd, "StoreFile") == 0){
 		  						printf("Receving file %s from client!!!!\n\n", search);
 		  						fun_Store_File(search);
+		  				
+		  						bzero(bf2, 1024);
+								sprintf(bf2, "Successfully Sent to server!!!");
+								
+		  						t = clock() - t;
+		  						double time_taken = ((double)t) / CLOCKS_PER_SEC;
+		  						char tmp[20];
+		  						sprintf(tmp, "%f", time_taken);
+		  						strcat(bf2, tmp);
+								send(client_sock, bf2, strlen(bf2), 0);
 		  					}
 		  					else if(strcmp(cmd, "GetFile") == 0){
 		  						printf("Cliented requested for File!!!!\n\n");
 		  						fun_Get_File(search, bf2);
+		  						t = clock() - t;
+		  						double time_taken = ((double)t) / CLOCKS_PER_SEC;
+		  						char tmp[20];
+		  						sprintf(tmp, "%f", time_taken);
+		  						strcat(bf2, tmp);
 		  						send(client_sock, bf2, strlen(bf2), 0);
 		  					}
 		  					else if(strcmp(cmd, "QUIT") == 0){

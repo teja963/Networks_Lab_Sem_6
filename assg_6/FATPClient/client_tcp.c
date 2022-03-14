@@ -5,7 +5,7 @@
 #include <sys/socket.h> 
 #include <unistd.h>
 #include <arpa/inet.h>
-char http_status_300[1024] = "Correct Username; Need password", http_status_301[1024] = "Incorrect Username", http_status_305[1024] = "User Authenticated with password", http_status_310[1024] = "Incorrect password", http_status_505[1024] = "Command not supported", http_ok[10] = "Send";
+char http_status_300[1024] = "300  Correct Username; Need password", http_status_301[1024] = "301  Incorrect Username", http_status_305[1024] = "305  User Authenticated with password", http_status_310[1024] = "310  Incorrect password", http_status_505[1024] = "505  Command not supported", http_ok[10] = "Send";
 int sock;
 char cmd[1024], search[1024];
 
@@ -181,7 +181,7 @@ int main(){
 	  	else if(strcmp(bf1, "Already Login") == 0){
 	  		printf("You Already Logined!!\n");
 	  	}
-	  	else{
+	  	else if(strcmp(bf1, http_status_300) != 0){
 	  		printf("Please Enter username correctly!!\n");
 	  		continue;
 	  	}
