@@ -16,24 +16,19 @@ int main(){
 	  /*   socket connection protocol(domain, type, protocol)   */
 	  int sock = socket(AF_INET, SOCK_STREAM, 0);
 	  if(sock < 0)
-	  {
-	                                                                                                                 
-	     perror("[-]Socket Connection is not established!!\n");
-	                                                                                                                 
+	  {                                                                                                              
+	     perror("[-]Socket Connection is not established!!\n");                                                                                                              
 	     exit(1);
 	  }
 	  else
-	  {
-	                                                                                                                
-	     printf("[+]Succesfully Established Socket connection!!\n");
-	                                                                                                                
+	  {                                                     
+	     printf("[+]Succesfully Established Socket connection!!\n");                                                                                                             
 	  }
 	  /* Intializing addr by memset takes pointers thats here addr is struct type*/
 	  memset(&addr, '\0' , sizeof(addr));
 	  addr.sin_family = AF_INET;
 	  addr.sin_port   = port;
 	  addr.sin_addr.s_addr = inet_addr(ip_addr);
-	  
 	  
 	  int check = connect(sock, (struct sockaddr*)&addr, sizeof(addr));
 	  if(check != 0){
@@ -67,27 +62,43 @@ int main(){
 		 if(strcmp(bf1, "Username and Password Verified\n") == 0){
 		 	while(1){
 		 		printf("\t\tPress 1: Manage Mail\n\t\tPress 2: Send Mail\n\t\tPress 3: Quit\n\n");
-			 	int num;
 			 	printf("Enter your option: ");
-			 	scanf("%d", &num);
+			 	fgets(tmp, 1024, stdin);
 			 	
-			 	if(num == 2){
+			 	if(strcmp(tmp, "2\n") == 0){
 			 		printf("To end the body Press '.' character\n");
 				 	bzero(bf1, 1024);
 				 	
-				 	printf("From: ");
-				 	strcat(bf1, "From: ");
-				 	scanf("%s", tmp);
-				 	strcat(bf1, tmp);
-				 	
 				 	printf("To: ");
 				 	strcat(bf1, "To: ");
-				 	scanf("%s", tmp);
+				 	fgets(tmp, 1024, stdin);
 				 	strcat(bf1, tmp);
+				 	
+				 	printf("From: ");
+				 	strcat(bf1, "From: ");
+				 	fgets(tmp, 1024, stdin);
+				 	strcat(bf1, tmp);
+				 	
+				 	printf("Subject: ");
+				 	strcat(bf1, "Subject: ");
+				 	fgets(tmp, 51, stdin);
+				 	strcat(bf1, tmp);
+				        
+				        char ch;
+				 	int i = 0;
+				 	printf("Body: ");
+				 	strcat(bf1, "Body: ");
+				 	bzero(tmp, 1024);
+				 	while(ch != '.'){
+				 		ch = getchar();
+				 		tmp[i++] = ch;
+				 	}
+				 	strcat(bf1, tmp);
+				 	strcat(bf1, "\n.");
 				 	
 				 	send(sock, bf1, strlen(bf1), 0);
 				 }
-				 else if(num == 3){
+				 else if(strcmp(tmp, "3\n") == 0){
 				 	printf("goodbye\n");
 				 	close(sock);
 				 	break;

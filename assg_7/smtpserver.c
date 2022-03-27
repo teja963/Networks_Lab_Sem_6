@@ -9,6 +9,29 @@
 #include <dirent.h>
 #include <time.h>
 static char uname[1024], upassword[1024], search[1024];
+char* extract(char mail[]){
+	char *name;
+	int n = strlen(mail);
+	while(n-- && mail[n] != '@');
+	name[n] = '\0';
+	while(n--){
+		name[n] = mail[n];
+	}
+	
+	return name;
+}
+void create(char msg[]){
+	char tmp[1024], mail[500], name[500];
+	int i = 0;
+	while(msg[i] != '\n'){
+		tmp[i] = msg[i];
+		i++;
+	}
+	sscanf(tmp, "%*s %s", mail);
+	strcpy(name, extract(mail));
+	
+	
+}
 int main(){
 	  char* ip_addr = "127.0.0.1";
 	  int port = 5000;
@@ -77,7 +100,7 @@ int main(){
 	  			flag = 1;
 	  		}
 	  	}
-	  	bzero(bf1, 1024);
+	  	fclose(fp);
 	  	if(flag == 1){
 	  		if(strcmp(upassword, tmp2) == 0){
 	  			sprintf(bf1, "Username and Password Verified\n");
@@ -85,9 +108,8 @@ int main(){
 	  			
 	  			bzero(bf1, 1024);
 	  			recv(client_sock, bf1, sizeof(bf1), 0);
-	  			printf("%s", bf1);
-	  			
-	  			
+	  			create(bf1);
+	  				
 	  		
 	  		}
 	  		else{
