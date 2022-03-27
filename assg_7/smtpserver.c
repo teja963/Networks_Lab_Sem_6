@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <time.h>
 int client_sock;
+static int check = 0;
 static char uname[1024], upassword[1024], search[1024];
 char* extract(char mail[]){
 	char *name;
@@ -18,16 +19,18 @@ char* extract(char mail[]){
 	while(n--){
 		name[n] = mail[n];
 	}
-	
 	return name;
 }
+
 void create(char msg[]){
 	char tmp[1024], mail[500], name[500];
 	int i = 0;
+	
 	while(msg[i] != '\n'){
 		tmp[i] = msg[i];
 		i++;
 	}
+	
 	sscanf(tmp, "%*s %s", mail);
 	strcpy(name, extract(mail));
 	strcat(name, "/mymailbox");
@@ -43,12 +46,14 @@ void create(char msg[]){
 	
 	fclose(fp);
 	send(client_sock, tmp, strlen(tmp), 0);
-	printf("Mail Created!!!\n");
-	
+	printf("Mail Created!!!\n");	
 }
+
 int main(){
 	  char* ip_addr = "127.0.0.1";
-	  int port = 5000;
+	  int port;
+	  printf("Enter the port number: ");
+	  scanf("%d",&port); 
 	  struct sockaddr_in server_addr, client_addr;
 	  socklen_t  addr_size;
 	  int n;
@@ -92,16 +97,17 @@ int main(){
 	  /* After connection established we need to listen */
 	  listen(server_sock, 5);        
 	  printf("Listening...........\n");     
-	  addr_size = sizeof(client_addr);                                                                               
-	  client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);   //This function syntax is imp                           
-	  printf("[+]Client Connected!!\n\n");		                                   
+	  addr_size = sizeof(client_addr);                                                                               	                                   
 	  
 	  
 	  /*Server responding to clients*/
 	  int flag = 0;
 	  while(1){
+	  	client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);   //This function syntax is imp                           
+	  	printf("[+]Client Connected!!\n\n");	
+	  	
 	  	char tmp1[1024], tmp2[1024];
-	  	bzero(bf1, 1024);
+  		bzero(bf1, 1024);
 	  	recv(client_sock, bf1, sizeof(bf1), 0);
 	  	
 	  	sscanf(bf1, "%s %*s", tmp1);
@@ -115,15 +121,17 @@ int main(){
 	  		}
 	  	}
 	  	fclose(fp);
+	  	
 	  	if(flag == 1){
 	  		if(strcmp(upassword, tmp2) == 0){
-	  			sprintf(bf1, "Username and Password Verified\n");
-	  			send(client_sock, bf1, strlen(bf1), 0);
+	  				sprintf(bf1, "Verified\n");
+	  				send(client_sock, bf1, strlen(bf1), 0);
+	  				check = 1;
 	  			
 	  			while(1){
 		  			bzero(bf1, 1024);
 		  			int status = recv(client_sock, bf1, sizeof(bf1), 0);
-		  			if(strcmp(bf1, "goodbye") == 0)break;
+		  			if(strcmp(bf1, "goodbye!!") == 0)break;
 		  			if(status > 0)create(bf1);	
 	  			}	
 	  		}
