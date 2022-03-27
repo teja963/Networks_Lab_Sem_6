@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <dirent.h>
 #include <time.h>
+int client_sock;
 static char uname[1024], upassword[1024], search[1024];
 char* extract(char mail[]){
 	char *name;
@@ -29,7 +30,20 @@ void create(char msg[]){
 	}
 	sscanf(tmp, "%*s %s", mail);
 	strcpy(name, extract(mail));
+	strcat(name, "/mymailbox");
 	
+	FILE* fp = fopen(name, "a+");
+	int status = fputs(msg, fp);
+	if(status == EOF){
+		sprintf(tmp, "Unable to send the mail\n");
+	}
+	else{
+		sprintf(tmp, "Mail sent successfully!!!\n");
+	}
+	
+	fclose(fp);
+	send(client_sock, tmp, strlen(tmp), 0);
+	printf("Mail Created!!!\n");
 	
 }
 int main(){
@@ -79,7 +93,7 @@ int main(){
 	  listen(server_sock, 5);        
 	  printf("Listening...........\n");     
 	  addr_size = sizeof(client_addr);                                                                               
-	  int client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);   //This function syntax is imp                           
+	  client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);   //This function syntax is imp                           
 	  printf("[+]Client Connected!!\n\n");		                                   
 	  
 	  
@@ -106,11 +120,12 @@ int main(){
 	  			sprintf(bf1, "Username and Password Verified\n");
 	  			send(client_sock, bf1, strlen(bf1), 0);
 	  			
-	  			bzero(bf1, 1024);
-	  			recv(client_sock, bf1, sizeof(bf1), 0);
-	  			create(bf1);
-	  				
-	  		
+	  			while(1){
+		  			bzero(bf1, 1024);
+		  			int status = recv(client_sock, bf1, sizeof(bf1), 0);
+		  			if(strcmp(bf1, "goodbye") == 0)break;
+		  			if(status > 0)create(bf1);	
+	  			}	
 	  		}
 	  		else{
 	  			sprintf(bf1, "Please Enter Correct Password\n");
@@ -119,9 +134,7 @@ int main(){
 	  	}
 	  	else{
 	  		sprintf(bf1, "Please Enter Valid Username and Password!!!!!\n");
-	  		send(client_sock, bf1, strlen(bf1), 0);
-	  			
-	  		
+	  		send(client_sock, bf1, strlen(bf1), 0);	
 	  	} 
 	  
 	  }

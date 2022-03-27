@@ -81,7 +81,7 @@ int main(){
 				 	
 				 	printf("Subject: ");
 				 	strcat(bf1, "Subject: ");
-				 	fgets(tmp, 51, stdin);
+				 	fgets(tmp, 1024, stdin);
 				 	strcat(bf1, tmp);
 				        
 				        char ch;
@@ -93,18 +93,25 @@ int main(){
 				 		ch = getchar();
 				 		tmp[i++] = ch;
 				 	}
+				 	getchar();        //after dot we are pressing dot character
 				 	strcat(bf1, tmp);
-				 	strcat(bf1, "\n.");
+				 	strcat(bf1, "\n");
 				 	
 				 	send(sock, bf1, strlen(bf1), 0);
+				 	
+				 	bzero(bf1, 1024);
+				 	recv(sock, bf1, sizeof(bf1), 0);
+				 	printf("%s", bf1);
 				 }
 				 else if(strcmp(tmp, "3\n") == 0){
-				 	printf("goodbye\n");
-				 	close(sock);
+				 	sprintf(bf1, "goodbye!!");
+				 	send(sock, bf1, strlen(bf1), 0);
 				 	break;
 				 }
 		 	}		 	
 		 }
+		 close(sock);
 		 break; 	
 	  }
+	  return 0;
 }
