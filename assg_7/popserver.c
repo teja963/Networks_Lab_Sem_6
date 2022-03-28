@@ -11,6 +11,37 @@
 int client_sock;
 static int check = 0;
 static char uname[1024], upassword[1024], search[1024];
+FILE *fp;
+char bf1[1024], bf2[1024];
+void display(){
+	int i = 0, j = 1;
+	char ch, tmp[10];
+	
+	bzero(bf1, 1024);
+	bf1[i++] = '1';
+	bf1[i++] = '.';
+	bf1[i++] = '\n';
+	
+	while((ch = fgetc(fp)) != EOF){
+		if(ch == '.'){
+			if((ch = fgetc(fp)) == '\n'){
+  				j++;
+  				bf1[i++] = '\n';
+  				bf1[i++] = j + '0';
+  				bf1[i++] = '.';
+  				bf1[i++] = '\n'; 					
+			}
+			else{
+				bf1[i++] = '.';
+				bf1[i++] = ch;
+			}
+		}
+		else{
+			bf1[i++] = ch; 
+		}	
+	}
+	bf1[i-4] = '\0';
+}
 
 int main(){
 	  char* ip_addr = "127.0.0.1";
@@ -20,7 +51,6 @@ int main(){
 	  struct sockaddr_in server_addr, client_addr;
 	  socklen_t  addr_size;
 	  int n;
-	  char bf1[1024], bf2[1024];
 	  /*   socket connection protocol(domain, type, protocol)   */
 	  int server_sock = socket(AF_INET, SOCK_STREAM, 0);
 	  if(server_sock < 0)
@@ -66,7 +96,7 @@ int main(){
 	  	sscanf(bf1, "%*s %s", upassword);
 	  	strcat(uname, "/mymailbox");
 	  	
-	  	FILE *fp = fopen(uname, "r");
+	  	fp = fopen(uname, "r");
 	  	
 	  	if(fp == NULL){
 	  		printf("file can't be opened\n");
@@ -81,36 +111,48 @@ int main(){
 	  		break;
 	  	}
 	  	else if(atoi(bf1) >= 1){
-	  		
-	  	}
-	  	else if(strcmp(bf1, "show") == 0){
-	  		printf("Client Asking list\n");
-	  		int i = 0, j = 1;
+	  		int i = 0, j = 1, num = atoi(bf1);
 	  		char ch, tmp[10];
+	  		printf("Client Asking to delete %d mail\n", num);
 	  		
 	  		bzero(bf1, 1024);
-	  		bf1[i++] = '1';
-	  		bf1[i++] = '.';
-	  		bf1[i++] = '\n';
 	  		while((ch = fgetc(fp)) != EOF){
 	  			if(ch == '.'){
-	  				if((ch = fgetc(fp)) == '\n'){
-		  				j++;
-		  				bf1[i++] = '\n';
-		  				bf1[i++] = j + '0';
-		  				bf1[i++] = '.';
-		  				bf1[i++] = '\n'; 					
+	  				ch = fgetc(fp);
+	  				if(ch == '\n' ){
+	  					j++;
+	  					if(j != num){
+		  					bf1[i++] = '.';
+		  					bf1[i++] = '\n';   						
+	  					}
 	  				}
-	  				else{
+	  				else if(j != num){
 	  					bf1[i++] = '.';
 	  					bf1[i++] = ch;
 	  				}
 	  			}
 	  			else{
-	  				bf1[i++] = ch; 
+	  				if(j != num)bf1[i++] = ch; 
 	  			}	
 	  		}
 	  		bf1[i-4] = '\0';
+	  		
+	  		FILE *ptr = fopen(uname, "w+");
+	  		if(ptr == NULL){
+	  			printf("Error!");
+	  			exit(1);
+	  		}
+	  		fprintf(ptr, "%s", bf1);
+	  		fclose(ptr);
+	  		
+	  		sprintf(bf1, "Data Updated Successfully!!\n");
+	  		send(client_sock, bf1, strlen(bf1), 0);
+		  				
+	  	}
+	  	else if(strcmp(bf1, "show") == 0){
+	  		printf("Client Asking list\n");
+                        display();	  
+	  
 	  		send(client_sock, bf1, strlen(bf1), 0);
 	  		printf("Data Sent!!!\n");
 	  			

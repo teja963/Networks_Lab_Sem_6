@@ -5,12 +5,18 @@
 #include <sys/socket.h> 
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <time.h>
 #define PORT 8000
 #define PORT_1 8001
 static char uname[1024], upassword[1024];
 char tmp[1024];
 char *ip_addr = "127.0.0.1";
 struct sockaddr_in addr;
+void calendar(char curr[], int sz){
+    struct timespec t;
+    timespec_get(&t, TIME_UTC);
+    strftime(curr, sz, "%D %T", localtime(&t.tv_sec));
+}
 int fun_socket(int port){
 	  int sock = socket(AF_INET, SOCK_STREAM, 0);
 	  if(sock < 0)
@@ -87,7 +93,7 @@ int main(){
 		 		send(sock, bf1, strlen(bf1), 0);
 		 		close(sock);
 		 		
-		 		printf("\t\tPress 1: Manage Mail\n\t\tPress 2: Send Mail\n\t\tPress 3: Quit\n\n");
+		 		printf("\n\t\tPress 1: Manage Mail\n\t\tPress 2: Send Mail\n\t\tPress 3: Quit\n\n");
 			 	printf("Enter your option: ");
 			 	fgets(tmp, 1024, stdin);
 			 	if(strcmp(tmp, "1\n") == 0){
@@ -120,6 +126,10 @@ int main(){
 	  				else if(strcmp(ch, "d\n") == 0){
 	  					fgets(bf1, 1024, stdin);
 	  					send(sock_pop, bf1, strlen(bf1), 0);
+	  					
+	  					bzero(bf1, 1024);
+	  					recv(sock_pop, bf1, sizeof(bf1), 0);
+	  					printf("%s", bf1);
 	  				}
 	  				else if(strcmp(ch, "s\n") == 0){
 	  					sprintf(bf1, "show");
@@ -151,8 +161,8 @@ int main(){
 					recv(sock, bf1, sizeof(bf1), 0);
 					
 					printf("To end the body Press '.' character\n");
-				 	bzero(bf1, 1024);
 				 	
+				 	bzero(bf1, 1024);
 				 	printf("To: ");
 				 	strcat(bf1, "To: ");
 				 	fgets(tmp, 1024, stdin);
@@ -167,6 +177,12 @@ int main(){
 				 	strcat(bf1, "Subject: ");
 				 	fgets(tmp, 1024, stdin);
 				 	strcat(bf1, tmp);
+				        
+				        char time[50];
+				 	calendar(time, 50);
+				 	strcat(bf1, "RECEIVED TIME: ");
+				 	strcat(bf1, time);
+				 	strcat(bf1, "\n");
 				        
 				        char ch;
 				 	int i = 0;

@@ -11,42 +11,76 @@
 int client_sock;
 static int check = 0;
 static char uname[1024], upassword[1024], search[1024];
-char* extract(char mail[]){
-	char *name;
+char name[500];
+int verify(char  *email){
+    int n = strlen(email);
+    int x = 0;
+    int y = 0;
+    int flag = 0;
+    for (int i = 0; i < n; i++){
+	if (email[i] == '@'){
+	    flag = 1;
+	    continue;
+	}
+
+	if (flag == 0)
+	    x++;
+	else
+	    y++;
+
+	if (y >= 1)
+	    break;
+    }
+
+    return x > 0 && y > 0;
+}
+void extract(char mail[]){
+	bzero(name, 500);
+	printf("Mail: %s\n", mail);
+	int i = 0;
 	int n = strlen(mail);
 	while(n-- && mail[n] != '@');
 	name[n] = '\0';
 	while(n--){
 		name[n] = mail[n];
 	}
-	return name;
 }
 
 void create(char msg[]){
 	char tmp[1024], mail[500], name[500];
 	int i = 0;
 	
+	bzero(tmp, 1024);
 	while(msg[i] != '\n'){
 		tmp[i] = msg[i];
 		i++;
 	}
-	
+	tmp[i] = '\0';
 	sscanf(tmp, "%*s %s", mail);
-	strcpy(name, extract(mail));
-	strcat(name, "/mymailbox");
 	
-	FILE* fp = fopen(name, "a+");
-	int status = fputs(msg, fp);
-	if(status == EOF){
-		sprintf(tmp, "Unable to send the mail\n");
+	if(verify(mail) == 1){
+		extract(mail);
+		strcat(name, "/mymailbox");
+		printf("%s\n", name);
+		
+		FILE *fp = fopen(name, "a+");
+		int status = fputs(msg, fp);
+		if(status == EOF){
+			sprintf(tmp, "Unable to send the mail\n");
+		}
+		else{
+			sprintf(tmp, "Mail sent successfully!!!\n");
+		}
+		
+		fclose(fp);
+		send(client_sock, tmp, strlen(tmp), 0);
+		printf("Mail Created!!!\n");		
 	}
 	else{
-		sprintf(tmp, "Mail sent successfully!!!\n");
+		sprintf(tmp, "Enter valid mail id\n");
+		send(client_sock, tmp, strlen(tmp), 0);
 	}
 	
-	fclose(fp);
-	send(client_sock, tmp, strlen(tmp), 0);
-	printf("Mail Created!!!\n");	
 }
 
 int main(){
@@ -131,6 +165,7 @@ int main(){
 	  			while(1){
 		  			bzero(bf1, 1024);
 		  			int status = recv(client_sock, bf1, sizeof(bf1), 0);
+		  			printf("%s", bf1);
 		  			if(strcmp(bf1, "goodbye!!") == 0)break;
 		  			if(status > 0)create(bf1);	
 	  			}	
