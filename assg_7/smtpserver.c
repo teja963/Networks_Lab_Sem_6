@@ -11,7 +11,7 @@
 int client_sock;
 static int check = 0;
 static char uname[1024], upassword[1024], search[1024];
-char name[500];
+char name_u[500];
 int verify(char  *email){
     int n = strlen(email);
     int x = 0;
@@ -34,9 +34,8 @@ int verify(char  *email){
 
     return x > 0 && y > 0;
 }
-void extract(char mail[]){
-	bzero(name, 500);
-	printf("Mail: %s\n", mail);
+char* extract(char mail[]){
+	char *name = (char *)malloc(100 *sizeof(char));
 	int i = 0;
 	int n = strlen(mail);
 	while(n-- && mail[n] != '@');
@@ -44,6 +43,7 @@ void extract(char mail[]){
 	while(n--){
 		name[n] = mail[n];
 	}
+	return name;
 }
 
 void create(char msg[]){
@@ -59,11 +59,10 @@ void create(char msg[]){
 	sscanf(tmp, "%*s %s", mail);
 	
 	if(verify(mail) == 1){
-		extract(mail);
-		strcat(name, "/mymailbox");
-		printf("%s\n", name);
+		strcat(name_u, extract(mail));
+		strcat(name_u, "/mymailbox");
 		
-		FILE *fp = fopen(name, "a+");
+		FILE *fp = fopen(name_u, "a+");
 		int status = fputs(msg, fp);
 		if(status == EOF){
 			sprintf(tmp, "Unable to send the mail\n");
@@ -165,7 +164,6 @@ int main(){
 	  			while(1){
 		  			bzero(bf1, 1024);
 		  			int status = recv(client_sock, bf1, sizeof(bf1), 0);
-		  			printf("%s", bf1);
 		  			if(strcmp(bf1, "goodbye!!") == 0)break;
 		  			if(status > 0)create(bf1);	
 	  			}	
