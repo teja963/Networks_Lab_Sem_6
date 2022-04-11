@@ -214,8 +214,8 @@ Ipv4InterfaceContainer r2r3interfaces;
   sinkApps.Stop (Seconds (100.0));
 
   AsciiTraceHelper ascii;
-      pointtopoint.EnableAsciiAll (ascii.CreateFileStream ("assgn.tr"));
-      pointtopoint.EnablePcapAll ("assgn", false);
+      pointtopoint.EnableAsciiAll (ascii.CreateFileStream ("teja.tr"));
+      pointtopoint.EnablePcapAll ("teja", false);
 
 
 
