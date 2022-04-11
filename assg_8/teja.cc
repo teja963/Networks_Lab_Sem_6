@@ -42,11 +42,11 @@ main (int argc, char *argv[])
   //point to point 5 Mbs
   PointToPointHelper pointtopoint;
   pointtopoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointtopoint.SetChannelAttribute ("Delay", StringValue ("20ms"));
+  //pointtopoint.SetChannelAttribute ("Delay", StringValue ("20ms"));
 
   PointToPointHelper pointtopoint2;
-  pointtopoint.SetDeviceAttribute ("DataRate", StringValue ("2Mbps"));
-  pointtopoint.SetChannelAttribute ("Delay", StringValue ("20ms"));
+  pointtopoint2.SetDeviceAttribute ("DataRate", StringValue ("2Mbps"));
+  pointtopoint2.SetChannelAttribute ("Delay", StringValue ("20ms"));
 
 
   NetDeviceContainer r1r2devices;
